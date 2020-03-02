@@ -1,28 +1,56 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <component :is="view" v-on:changeCurrent="changeView"></component>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import {db} from './firebase'
+import Intro from './components/Intro'
+import Welcome from './components/Welcome'
+import Container from './components/container.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Container,
+    Intro,
+    Welcome
+  },
+  data(){
+    return{
+      view: "Intro",
+      database: db.ref('/border'),
+      datos: []
+    }
+  },
+  methods:{
+    async dameDatos(){
+      let aux
+      await this.database.once('value').then(function(snapshot){
+        aux = snapshot.val()
+      })
+      this.datos = aux
+    },
+    changeView(viewString){
+      this.view = viewString
+    }
+  },
+  created(){
+    this.dameDatos()
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+#app{
+  margin: 0;
 }
+
+    *{
+        margin: 0;
+        padding: 0;
+    }
+
 </style>
